@@ -4,7 +4,7 @@ import numpy as np
 import os
 import pandas
 
-from equirectangular_to_rectilinear import EquirectangularToRectilinear
+from equirectangular_to_dualfisheye import EquirectangularToDualfisheye
 import file_utils
 import np_utils
 from pedometer import Pedometer
@@ -47,10 +47,7 @@ class GoproToHdf5(object):
         assert self._mp4_fps % GoproToHdf5.FPS == 0
         print('MP4 file: {0}'.format(self._mp4_fname))
         print('MP4 fps: {0}'.format(self._mp4_fps))
-        self._equi_to_rect = EquirectangularToRectilinear(frame_shape=[1920, 3840, 3],
-                                                          shape=[360, 720, 3],
-                                                          center_point=[0.5, 0.5],
-                                                          fov=1.5) # TODO 0.5
+        self._equi_to_dualfisheye = EquirectangularToDualfisheye()
 
         ### iterating
         # image
@@ -95,7 +92,8 @@ class GoproToHdf5(object):
             self._hdf5_dict.time.append(self._frame_time)
 
             curr_frame = cv2.cvtColor(self._curr_frame, cv2.COLOR_BGR2RGB)
-            curr_frame = self._equi_to_rect.to_rectilinear(curr_frame[None])[0]
+            curr_frame = self._equi_to_dualfisheye.to_rectified(curr_frame)
+            curr_frame = np_utils.imresize(curr_frame, [90, 160, 3])
             self._hdf5_dict.image.append(curr_frame)
 
         self._frames_since_last_save += 1
