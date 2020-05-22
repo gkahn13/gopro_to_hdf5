@@ -57,25 +57,25 @@ class HDF5Visualizer(object):
         if self._curr_data is not None:
             self._curr_data.close()
         self._curr_data = h5py.File(self._data_fnames[self._curr_data_idx], 'r')
-        self._curr_data_len = len(self._curr_data['turn']) - 1
+        self._curr_data_len = len(self._curr_data['turn'])
 
     @property
     def no_more_timesteps(self):
-        return self._curr_data_timestep >= self._curr_data_len - 1
+        return self._curr_data_timestep >= self._curr_data_len
 
     @property
     def no_more_files(self):
-        return self._curr_data_idx == len(self._data_fnames) - 1
+        return self._curr_data_idx >= len(self._data_fnames) - 1
 
     def next_timestep(self):
-        if self.no_more_timesteps and self.no_more_files:
-            return # at the end, do nothing
-
         self._curr_data_timestep += 1
         if self.no_more_timesteps:
-            self._curr_data_idx += 1
-            self._load_data()
-            self._curr_data_timestep = 0
+            if self.no_more_files:
+                self._curr_data_timestep -= 1
+            else:
+                self._curr_data_idx += 1
+                self._load_data()
+                self._curr_data_timestep = 0
 
     def prev_timestep(self):
         if (self._curr_data_timestep == 0) and (self._curr_data_idx == 0):
@@ -85,7 +85,7 @@ class HDF5Visualizer(object):
         if self._curr_data_timestep < 0:
             self._curr_data_idx -= 1
             self._load_data()
-            self._curr_data_timestep = self._curr_data_len - 2
+            self._curr_data_timestep = self._curr_data_len - 1
 
     def next_data(self):
         if self.no_more_files:
@@ -110,7 +110,7 @@ class HDF5Visualizer(object):
             self._curr_data_idx += 1
 
         self._load_data()
-        self._curr_data_timestep = self._curr_data_len - 2
+        self._curr_data_timestep = self._curr_data_len - 1
 
     def prev_data_end(self):
         if self._curr_data_idx == 0:
@@ -119,7 +119,7 @@ class HDF5Visualizer(object):
             self._curr_data_idx -= 1
 
         self._load_data()
-        self._curr_data_timestep = self._curr_data_len - 2
+        self._curr_data_timestep = self._curr_data_len - 1
 
 
     #################

@@ -220,11 +220,33 @@ class GoproToHdf5(object):
         self._hdf5_dict.commands.turn = np.array(turns)
 
     def _hdf5_save(self):
-        hdf5_fname = os.path.join(self._hdf5_folder, '{0:03d}.hdf5'.format(0))
-        with h5py.File(hdf5_fname, 'w') as f:
-            f['image'] = np.array(np_utils.im2bytes(np.array(self._hdf5_dict.image)))
-            f['step'] = np.array(self._hdf5_dict.commands.step)
-            f['turn'] = np.array(self._hdf5_dict.commands.turn)
+        image = np.array(np_utils.im2bytes(np.array(self._hdf5_dict.image)))
+        step = np.array(self._hdf5_dict.commands.step)
+        turn = np.array(self._hdf5_dict.commands.turn)
+
+        stopped = step < 0.25
+
+        stopped_smooth = stopped.copy()
+        window_size = int(1.0 * self.FPS)
+        window_size += (window_size % 2 == 0)
+        hwin = (window_size - 1) // 2
+        for i in range(hwin, len(stopped_smooth) - hwin):
+            stopped_smooth[i-hwin:i+hwin] = stopped[i-hwin:i+hwin].min()
+
+        stopped_changes = np.convolve([True] + list(stopped_smooth) + [True],
+                                      [1, -1],
+                                      mode='valid')
+
+        start_indices = np.where(stopped_changes < 0)[0]
+        stop_indices = np.where(stopped_changes > 0)[0]
+        assert len(start_indices) == len(stop_indices)
+
+        for i, (start_idx, stop_idx) in enumerate(zip(start_indices, stop_indices)):
+            hdf5_fname = os.path.join(self._hdf5_folder, '{0:03d}.hdf5'.format(i))
+            with h5py.File(hdf5_fname, 'w') as f:
+                f['image'] = image[start_idx:stop_idx]
+                f['step'] = step[start_idx:stop_idx]
+                f['turn'] = turn[start_idx:stop_idx]
 
     def _close(self):
         self._cap.release()
