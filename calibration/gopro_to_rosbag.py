@@ -5,10 +5,10 @@ import os
 import rosbag
 import rospy
 import ros_numpy
-from sensor_msgs.msg import Image, Imu, MagneticField
+from sensor_msgs.msg import Image
 
-import equirectangular_to_dualfisheye
-import file_utils
+from gopro import equirectangular_to_dualfisheye
+from utils import file_utils
 
 
 class StampAndMessage(object):

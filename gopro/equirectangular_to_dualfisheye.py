@@ -3,7 +3,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 
-import np_utils
+from utils import np_utils
 
 
 class EquirectangularToDualfisheye(object):

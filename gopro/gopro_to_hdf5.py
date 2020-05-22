@@ -4,12 +4,10 @@ import numpy as np
 import os
 import pandas
 
-from equirectangular_to_dualfisheye import EquirectangularToDualfisheye
-import file_utils
-import np_utils
-from pedometer import Pedometer
-from python_utils import AttrDict
-import transformations
+from gopro.equirectangular_to_dualfisheye import EquirectangularToDualfisheye
+from utils import file_utils, np_utils, transformations
+from gopro.pedometer import Pedometer
+from utils.python_utils import AttrDict
 
 
 class GoproToHdf5(object):

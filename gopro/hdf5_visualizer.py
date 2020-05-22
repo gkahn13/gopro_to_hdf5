@@ -4,11 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from gopro_utils import turns_and_steps_to_positions
-import file_utils
-import np_utils
-import pyblit
-from python_utils import Getch
+from utils.gopro_utils import turns_and_steps_to_positions
+from utils import file_utils, np_utils, pyblit
+from utils.python_utils import Getch
 
 
 class HDF5Visualizer(object):
@@ -220,14 +218,3 @@ class HDF5Visualizer(object):
             else:
                 continue
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument('folder', type=str, help='find hdf5 files in subdirectories')
-parser.add_argument('-horizon', type=int, default=8)
-args = parser.parse_args()
-
-hdf5_fnames = sorted(file_utils.recursive_get_files_ending_with(args.folder, '.hdf5'))
-assert len(hdf5_fnames) > 0
-for fname in hdf5_fnames:
-    print(fname)
-HDF5Visualizer(hdf5_fnames, args.horizon).run()

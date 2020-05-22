@@ -3,7 +3,7 @@
 import collections
 import numpy as np
 
-import np_utils
+from utils import np_utils
 
 
 class StepDecider:
