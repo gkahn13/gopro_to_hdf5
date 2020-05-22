@@ -50,7 +50,7 @@ class GoproToHdf5(object):
         self._equi_to_rect = EquirectangularToRectilinear(frame_shape=[1920, 3840, 3],
                                                           shape=[360, 720, 3],
                                                           center_point=[0.5, 0.5],
-                                                          fov=0.5)
+                                                          fov=1.5) # TODO 0.5
 
         ### iterating
         # image
