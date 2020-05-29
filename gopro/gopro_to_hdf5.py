@@ -224,7 +224,7 @@ class GoproToHdf5(object):
         step = np.array(self._hdf5_dict.commands.step)
         turn = np.array(self._hdf5_dict.commands.turn)
 
-        stopped = step < 0.25
+        stopped = step < 0.15
 
         stopped_smooth = stopped.copy()
         window_size = int(1.0 * self.FPS)
@@ -233,7 +233,11 @@ class GoproToHdf5(object):
         for i in range(hwin, len(stopped_smooth) - hwin):
             stopped_smooth[i-hwin:i+hwin] = stopped[i-hwin:i+hwin].min()
 
-        stopped_changes = np.convolve([True] + list(stopped_smooth) + [True],
+        step_deriv = np.concatenate([[0.], np.convolve(step, [1, -1], mode='valid')])
+        stop_deriv = abs(step_deriv) < 1e-3
+        stop_deriv[-1] = True
+
+        stopped_changes = np.convolve([True] + list(np.logical_and(stopped_smooth, stop_deriv)) + [True],
                                       [1, -1],
                                       mode='valid')
 

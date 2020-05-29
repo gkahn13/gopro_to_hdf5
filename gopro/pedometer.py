@@ -197,4 +197,6 @@ class Pedometer(object):
             ))
         step_rates = np.clip(step_rates, 0., 3.5)
 
+        step_rates[self._times >= step_times[-1]] = 0. # NOTE(greg): no walking after last step
+
         return step_rates
