@@ -12,7 +12,7 @@ from utils.python_utils import AttrDict
 
 class GoproToHdf5(object):
 
-    FPS = 3
+    FPS = 5
 
     def __init__(self, folder):
         assert os.path.exists(folder)
@@ -224,7 +224,7 @@ class GoproToHdf5(object):
         step = np.array(self._hdf5_dict.commands.step)
         turn = np.array(self._hdf5_dict.commands.turn)
 
-        stopped = step < 0.15
+        stopped = step < 0.1
 
         stopped_smooth = stopped.copy()
         window_size = int(1.0 * self.FPS)
@@ -245,7 +245,12 @@ class GoproToHdf5(object):
         stop_indices = np.where(stopped_changes > 0)[0]
         assert len(start_indices) == len(stop_indices)
 
+        start_buffer = int(1.5 * self.FPS)
         for i, (start_idx, stop_idx) in enumerate(zip(start_indices, stop_indices)):
+            start_idx += start_buffer
+            if stop_idx - start_idx < int(1 * self.FPS): # if trajectory is less than 1 second long, skip
+                continue
+
             hdf5_fname = os.path.join(self._hdf5_folder, '{0:03d}.hdf5'.format(i))
             with h5py.File(hdf5_fname, 'w') as f:
                 f['image'] = image[start_idx:stop_idx]

@@ -140,8 +140,8 @@ class HDF5Visualizer(object):
         self._pyblit_poses.draw(positions[:, 1], positions[:, 0])
 
         ax = self._pyblit_poses_ax.ax
-        max_speed = 3.5
-        dt = 0.3
+        max_speed = 2.0
+        dt = 0.2
         max_position = max_speed * dt * self._horizon
         ax.set_xlim((-max_position, max_position))
         ax.set_ylim((-0.1, max_position))

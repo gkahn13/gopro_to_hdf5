@@ -15,7 +15,7 @@ gopro_to_hdf5_parser.add_argument('--threads', type=int, default=1)
 
 hdf5_visualizer_parser = subparsers.add_parser('hdf5_visualizer')
 hdf5_visualizer_parser.add_argument('folder', type=str, help='find hdf5 files in subdirectories')
-hdf5_visualizer_parser.add_argument('-horizon', type=int, default=8)
+hdf5_visualizer_parser.add_argument('-horizon', type=int, default=15)
 
 args = parser.parse_args()
 
@@ -31,7 +31,7 @@ if args.command == 'gopro_to_hdf5':
         def run(f):
             GoproToHdf5(f).run()
         pool = Pool(args.threads)
-        pool.map(run, args.folders)
+        pool.map(run, folders)
 elif args.command == 'hdf5_visualizer':
     hdf5_fnames = sorted(file_utils.recursive_get_files_ending_with(args.folder, '.hdf5'))
     assert len(hdf5_fnames) > 0
